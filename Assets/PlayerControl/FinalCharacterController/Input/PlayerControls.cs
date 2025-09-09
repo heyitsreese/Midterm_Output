@@ -118,6 +118,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""9c951a6c-9201-49aa-b7ac-236407b63eb2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -197,6 +206,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0808e92b-c52c-496c-89ec-8765ec199b7c"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -208,6 +228,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_PlayerLocamotionMap_Movement = m_PlayerLocamotionMap.FindAction("Movement", throwIfNotFound: true);
         m_PlayerLocamotionMap_Look = m_PlayerLocamotionMap.FindAction("Look", throwIfNotFound: true);
         m_PlayerLocamotionMap_Sprint = m_PlayerLocamotionMap.FindAction("Sprint", throwIfNotFound: true);
+        m_PlayerLocamotionMap_Jump = m_PlayerLocamotionMap.FindAction("Jump", throwIfNotFound: true);
     }
 
     ~@PlayerControls()
@@ -291,6 +312,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerLocamotionMap_Movement;
     private readonly InputAction m_PlayerLocamotionMap_Look;
     private readonly InputAction m_PlayerLocamotionMap_Sprint;
+    private readonly InputAction m_PlayerLocamotionMap_Jump;
     /// <summary>
     /// Provides access to input actions defined in input action map "PlayerLocamotionMap".
     /// </summary>
@@ -314,6 +336,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PlayerLocamotionMap/Sprint".
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_PlayerLocamotionMap_Sprint;
+        /// <summary>
+        /// Provides access to the underlying input action "PlayerLocamotionMap/Jump".
+        /// </summary>
+        public InputAction @Jump => m_Wrapper.m_PlayerLocamotionMap_Jump;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -349,6 +375,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
         }
 
         /// <summary>
@@ -369,6 +398,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
         }
 
         /// <summary>
@@ -430,5 +462,12 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnJump(InputAction.CallbackContext context);
     }
 }

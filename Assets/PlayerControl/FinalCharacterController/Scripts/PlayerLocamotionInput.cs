@@ -12,6 +12,9 @@ public class PlayerLocamotionInput : MonoBehaviour, PlayerControls.IPlayerLocamo
     public PlayerControls PlayerControls { get; private set; }
     public Vector2 MovementInput { get; private set; }
     public Vector2 LookInput { get; private set; }
+    public bool JumpPressed { get; private set; }
+    public void ConsumeJump() => JumpPressed = false;
+
 
 
     private void OnEnable()
@@ -23,10 +26,15 @@ public class PlayerLocamotionInput : MonoBehaviour, PlayerControls.IPlayerLocamo
         PlayerControls.PlayerLocamotionMap.SetCallbacks(this);
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         PlayerControls.PlayerLocamotionMap.Disable();
         PlayerControls.PlayerLocamotionMap.RemoveCallbacks(this);
+    }
+
+    private void LateUpdate()
+    {
+        JumpPressed = false;
     }
 
     public void OnMovement(InputAction.CallbackContext context)
@@ -51,5 +59,13 @@ public class PlayerLocamotionInput : MonoBehaviour, PlayerControls.IPlayerLocamo
         {
             SprintToggledOn = !holdToSprint && SprintToggledOn;
         }
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+            JumpPressed = true;
     }
 }
