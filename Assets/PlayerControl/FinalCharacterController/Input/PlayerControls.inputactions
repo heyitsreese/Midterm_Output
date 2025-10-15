@@ -133,6 +133,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "PlayerInteractions",
+            "id": "bd0bea9b-39c1-41cb-923c-c742d17f81da",
+            "actions": [
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "d6510549-ac48-4264-a476-1165e1f94751",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6e113669-0c67-429b-8ac1-d2d5fb1cd81e",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
