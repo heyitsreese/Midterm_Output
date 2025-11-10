@@ -7,8 +7,8 @@ public class TutorialManager : MonoBehaviour
 {
     [Header("UI References")]
     public GameObject tutorialPanel;
-    public UnityEngine.UI.Text tutorialText;
-    public UnityEngine.UI.Text continuePromptText;
+    public TMP_Text tutorialText;
+    public TMP_Text continuePromptText;
 
     [Header("Tutorial Settings")]
     public float typingSpeed = 0.03f;
