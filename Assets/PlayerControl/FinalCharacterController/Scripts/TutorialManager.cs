@@ -103,7 +103,7 @@ public class TutorialManager : MonoBehaviour
         return pressedW && pressedA && pressedS && pressedD;
     }
 
-    void ShowMessage(string message)
+    public void ShowMessage(string message)
     {
         tutorialPanel.SetActive(true);
         tutorialText.text = message;
@@ -207,5 +207,11 @@ public class TutorialManager : MonoBehaviour
 
         isStoryPlaying = false;
         this.enabled = false;
+    }
+
+    public void HideMessage()
+    {
+        tutorialText.text = ""; 
+        tutorialPanel.SetActive(false);
     }
 }
