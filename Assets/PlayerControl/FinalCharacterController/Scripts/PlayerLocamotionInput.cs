@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(-2)]
 public class PlayerLocamotionInput : MonoBehaviour, PlayerControls.IPlayerLocamotionMapActions

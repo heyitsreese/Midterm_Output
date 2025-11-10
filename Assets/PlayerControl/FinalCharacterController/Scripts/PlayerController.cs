@@ -20,6 +20,10 @@ public class PlayerController : MonoBehaviour
     public float jumpSpeed = 1.0f;
     public float movingThres = 0.01f;
 
+    [Header("Control Locks")]
+    public bool canMove = true;
+    public bool canJump = true;
+
     [Header("Camera Settings")]
     public float SensH = 0.1f;
     public float SensV = 0.1f;
@@ -37,6 +41,8 @@ public class PlayerController : MonoBehaviour
     {
         playerLocamotionInput = GetComponent<PlayerLocamotionInput>();
         playerState = GetComponent<PlayerState>();
+
+        SetCursorState(true);
     }
 
     private void Update()
@@ -74,13 +80,17 @@ public class PlayerController : MonoBehaviour
         if (isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
 
-        if (playerLocamotionInput.JumpPressed && isGrounded)
+        if (canJump && playerLocamotionInput.JumpPressed && isGrounded)
         {
             verticalVelocity = Mathf.Sqrt(jumpSpeed * 2f * gravity);
-
             playerLocamotionInput.ConsumeJump();
         }
 
+        if (!canMove)
+        {
+            characterController.Move(Vector3.down * gravity * Time.deltaTime); // stay grounded
+            return;
+        }
         verticalVelocity -= gravity * Time.deltaTime;
     }
 
@@ -124,7 +134,22 @@ public class PlayerController : MonoBehaviour
         return lateralVelocity.magnitude > movingThres;
     }
 
-    private bool IsGrounded() {
+    private bool IsGrounded()
+    {
         return characterController.isGrounded;
+    }
+
+    public void SetCursorState(bool locked)
+    {
+        if (locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 }

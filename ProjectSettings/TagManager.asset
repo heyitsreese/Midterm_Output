@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Interactable
   - F to Pickup
+  - Pickupable
+  - Door
+  - Key
+  - SafeZone
+  - Pond
   layers:
   - Default
   - TransparentFX
