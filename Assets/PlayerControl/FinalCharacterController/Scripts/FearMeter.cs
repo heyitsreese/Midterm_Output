@@ -103,11 +103,16 @@ public class FearMeter : MonoBehaviour
     public Camera playerCamera;
     public float shakeMagnitude = 0.1f;
     public float shakeSpeed = 5f;
-    public Image hazeOverlay; // semi-transparent UI panel for haze effect
+    public Image hazeOverlay;
     public float hazeMaxAlpha = 0.5f;
 
+    [Header("Audio")]
+    public AudioSource normalMusicSource;       // assign your regular background music
+    public AudioSource fearMusicSource;         // assign your eerie background music
+    public AudioSource backgroundVoicesSource;  // assign creepy voices / whispers
+
     [Header("Messages")]
-    public TutorialManager tutorialManager; // Assign your TutorialManager here
+    public TutorialManager tutorialManager;
     private bool hasTriggeredHallucinationMessage = false;
 
     private Vector3 originalCamPos;
@@ -125,6 +130,11 @@ public class FearMeter : MonoBehaviour
 
         if (hazeOverlay != null)
             hazeOverlay.color = new Color(hazeOverlay.color.r, hazeOverlay.color.g, hazeOverlay.color.b, 0);
+
+        // Ensure initial music states
+        if (fearMusicSource != null) fearMusicSource.Stop();
+        if (backgroundVoicesSource != null) backgroundVoicesSource.Stop();
+        if (normalMusicSource != null && !normalMusicSource.isPlaying) normalMusicSource.Play();
     }
 
     void Update()
@@ -137,12 +147,10 @@ public class FearMeter : MonoBehaviour
 
         bool isNight = dayNightCycle.IsNight;
 
+        // ✅ Fixed logic: works even if player never enters Safe Zone
         if (isNight)
         {
-            if (!isInSafeZone)
-                fear += increaseRate * Time.deltaTime;
-            else
-                fear -= decreaseRate * Time.deltaTime;
+            fear += (!isInSafeZone ? increaseRate : -decreaseRate) * Time.deltaTime;
         }
         else
         {
@@ -152,6 +160,7 @@ public class FearMeter : MonoBehaviour
         fear = Mathf.Clamp(fear, 0, maxFear);
 
         UpdateUI();
+        HandleAudio();
     }
 
     void UpdateUI()
@@ -165,52 +174,36 @@ public class FearMeter : MonoBehaviour
 
         float fearRatio = fear / maxFear;
 
+        // --- Message when hallucinations start ---
         if (fearRatio >= 0.8f && !hasTriggeredHallucinationMessage)
         {
             hasTriggeredHallucinationMessage = true;
-            if (tutorialManager != null)
-            {
-                tutorialManager.ShowMessage("You've been lingering outside the safe zone too long. You're now feeling an earthquake... Or are you?");
-            }
+            tutorialManager?.ShowMessage("You've been lingering outside the safe zone too long. You're now feeling an earthquake... Or are you?");
         }
-
-        // Optional: reset the message trigger if fear drops below 80%
-        if (fearRatio < 0.8f)
+        else if (fearRatio < 0.8f && hasTriggeredHallucinationMessage)
         {
             hasTriggeredHallucinationMessage = false;
+            tutorialManager?.HideMessage();
         }
 
-
-        // --- Camera shake ---
-        if (fearRatio >= 0.8f && playerCamera != null)
-        {
-            Vector3 shakeOffset = Random.insideUnitSphere * shakeMagnitude;
-            shakeOffset.z = 0;
-            playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, originalCamPos + shakeOffset, Time.deltaTime * shakeSpeed);
-        }
-        else if (playerCamera != null)
-        {
-            playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, originalCamPos, Time.deltaTime * shakeSpeed);
-        }
-
-        HandleFearEffects();
+        HandleFearEffects(fearRatio);
     }
 
-    void HandleFearEffects()
+    void HandleFearEffects(float fearRatio)
     {
-        float fearRatio = fear / maxFear;
-
         // Camera shake
-        if (fearRatio >= 0.8f && playerCamera != null)
+        if (playerCamera != null)
         {
-            Vector3 shakeOffset = Random.insideUnitSphere * shakeMagnitude;
-            shakeOffset.z = 0; // optional: only shake X and Y
-            playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, originalCamPos + shakeOffset, Time.deltaTime * shakeSpeed);
-        }
-        else if (playerCamera != null)
-        {
-            // Reset camera
-            playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, originalCamPos, Time.deltaTime * shakeSpeed);
+            if (fearRatio >= 0.8f)
+            {
+                Vector3 shakeOffset = Random.insideUnitSphere * shakeMagnitude;
+                shakeOffset.z = 0;
+                playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, originalCamPos + shakeOffset, Time.deltaTime * shakeSpeed);
+            }
+            else
+            {
+                playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, originalCamPos, Time.deltaTime * shakeSpeed);
+            }
         }
 
         // Haze overlay
@@ -223,18 +216,43 @@ public class FearMeter : MonoBehaviour
         }
     }
 
+    void HandleAudio()
+    {
+        float fearRatio = fear / maxFear;
+
+        // When fear hits 50%, switch music and play background voices
+        if (fearRatio >= 0.5f)
+        {
+            if (normalMusicSource != null && normalMusicSource.isPlaying)
+                normalMusicSource.Stop();
+
+            if (fearMusicSource != null && !fearMusicSource.isPlaying)
+                fearMusicSource.Play();
+
+            if (backgroundVoicesSource != null && !backgroundVoicesSource.isPlaying)
+                backgroundVoicesSource.Play();
+        }
+        else
+        {
+            // Return to calm state
+            if (fearMusicSource != null && fearMusicSource.isPlaying)
+                fearMusicSource.Stop();
+
+            if (backgroundVoicesSource != null && backgroundVoicesSource.isPlaying)
+                backgroundVoicesSource.Stop();
+
+            if (normalMusicSource != null && !normalMusicSource.isPlaying)
+                normalMusicSource.Play();
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("SafeZone"))
         {
             isInSafeZone = true;
             Debug.Log("🟢 Entered Safe Zone");
-
-            // Hide hallucination message when player is safe
-            if (tutorialManager != null)
-            {
-                tutorialManager.HideMessage();
-            }
+            tutorialManager?.HideMessage();
         }
     }
 
@@ -245,5 +263,10 @@ public class FearMeter : MonoBehaviour
             isInSafeZone = false;
             Debug.Log("🔴 Left Safe Zone");
         }
+    }
+
+    public void IncreaseFear(float amount)
+    {
+        fear = Mathf.Clamp(fear + amount, 0f, maxFear);
     }
 }

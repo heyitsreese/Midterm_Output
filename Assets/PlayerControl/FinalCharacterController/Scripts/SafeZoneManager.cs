@@ -29,6 +29,11 @@ public class SafeZoneManager : MonoBehaviour
         }
     }
 
+    public bool IsPlayerSafe()
+    {
+        return isPlayerSafe;
+    }
+
     void OnDrawGizmosSelected()
     {
         if (centerPoint == null) return;

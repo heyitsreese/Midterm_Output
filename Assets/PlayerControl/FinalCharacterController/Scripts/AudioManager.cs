@@ -8,11 +8,14 @@ public class AudioManager : MonoBehaviour
     [Header("Audio Mixer")]
     public AudioMixer audioMixer;
 
-    [Header("Audio Sources")]
-    public AudioSource musicSource;
-    public AudioSource sfxSource;
+    [Header("Music Sources")]
+    public AudioSource normalMusicSource;
+    public AudioSource fearMusicSource;
 
-    [Header("Audio Clips")]
+    [Header("SFX Sources")]
+    public AudioSource footstepsSource;
+    public AudioSource whisper1Source;
+    public AudioSource whisper2Source;
     public AudioClip clickSound;
 
     private const string MusicVolumeKey = "MusicVolume";
@@ -20,7 +23,6 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern
         if (Instance == null)
         {
             Instance = this;
@@ -33,28 +35,75 @@ public class AudioManager : MonoBehaviour
         }
 
         // Load saved volumes
-        float musicVol = PlayerPrefs.GetFloat(MusicVolumeKey, 1f);
-        float sfxVol = PlayerPrefs.GetFloat(SFXVolumeKey, 1f);
-
-        SetMusicVolume(musicVol);
-        SetSFXVolume(sfxVol);
+        SetMusicVolume(PlayerPrefs.GetFloat(MusicVolumeKey, 1f));
+        SetSFXVolume(PlayerPrefs.GetFloat(SFXVolumeKey, 1f));
     }
 
-    public void PlayClickSound()
+    // ================= MUSIC ================= //
+    public void PlayNormalMusic()
     {
-        if (clickSound != null && sfxSource != null)
-            sfxSource.PlayOneShot(clickSound);
+        fearMusicSource?.Stop();
+        normalMusicSource?.Play();
+    }
+
+    public void PlayFearMusic()
+    {
+        normalMusicSource?.Stop();
+        fearMusicSource?.Play();
+    }
+
+    public void StopAllMusic()
+    {
+        normalMusicSource?.Stop();
+        fearMusicSource?.Stop();
     }
 
     public void SetMusicVolume(float value)
     {
         if (audioMixer != null)
         {
-            // Convert linear (0–1) to decibels (-80 dB to 0 dB)
             float dB = Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 20f;
             audioMixer.SetFloat("MusicVolume", dB);
             PlayerPrefs.SetFloat(MusicVolumeKey, value);
         }
+    }
+
+    public float GetMusicVolume() => PlayerPrefs.GetFloat(MusicVolumeKey, 1f);
+
+    // ================= SFX ================= //
+
+    public void PlayClickSound()
+    {
+        if (clickSound != null)
+            footstepsSource?.PlayOneShot(clickSound); // use footstepsSource for generic SFX
+    }
+
+    public void PlayFootsteps()
+    {
+        footstepsSource?.Play();
+    }
+
+    public void StopFootsteps()
+    {
+        footstepsSource?.Stop();
+    }
+
+    public void PlayWhisper1()
+    {
+        if (whisper1Source != null && !whisper1Source.isPlaying)
+            whisper1Source.Play();
+    }
+
+    public void PlayWhisper2()
+    {
+        if (whisper2Source != null && !whisper2Source.isPlaying)
+            whisper2Source.Play();
+    }
+
+    public void StopWhispers()
+    {
+        whisper1Source?.Stop();
+        whisper2Source?.Stop();
     }
 
     public void SetSFXVolume(float value)
@@ -64,9 +113,13 @@ public class AudioManager : MonoBehaviour
             float dB = Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 20f;
             audioMixer.SetFloat("SFXVolume", dB);
             PlayerPrefs.SetFloat(SFXVolumeKey, value);
+
+            // Also set volume of individual SFX sources
+            footstepsSource.volume = value;
+            whisper1Source.volume = value;
+            whisper2Source.volume = value;
         }
     }
 
-    public float GetMusicVolume() => PlayerPrefs.GetFloat(MusicVolumeKey, 1f);
     public float GetSFXVolume() => PlayerPrefs.GetFloat(SFXVolumeKey, 1f);
 }

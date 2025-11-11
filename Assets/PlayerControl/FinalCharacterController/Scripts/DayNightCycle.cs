@@ -122,6 +122,7 @@ public class DayNightCycle : MonoBehaviour
     public WinLoss winLoss;
     public Vector3 doorSpawnPosition;
     public Vector3 keySpawnPosition;
+    public Transform player;
 
     public GameObject ghost;
 
@@ -184,6 +185,8 @@ public class DayNightCycle : MonoBehaviour
                 UpdateDayCounterUI();
                 Debug.Log($"☀️ Day {currentDay} started!");
 
+                SpawnGhostsNearPlayer(3);
+
                 if (currentDay == 4)
                     SpawnKey();
                 else if (currentDay == 5)
@@ -197,6 +200,40 @@ public class DayNightCycle : MonoBehaviour
             Debug.LogWarning("⚠️ Key was deactivated unexpectedly!");
         }
     }
+
+    void SpawnGhostsNearPlayer(int count)
+    {
+        if (ghost == null || player == null)
+        {
+            Debug.LogError("❌ Missing ghostPrefab or player in DayNightCycle!");
+            return;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            // Random position near player (5–15 units away, not too close)
+            Vector3 randomOffset = new Vector3(
+                Random.Range(-15f, 15f),
+                0,
+                Random.Range(-15f, 15f)
+            );
+
+            Vector3 spawnPos = player.position + randomOffset;
+
+            // Make sure it's not too close (avoid spawning right beside)
+            if (Vector3.Distance(spawnPos, player.position) < 5f)
+            {
+                spawnPos += randomOffset.normalized * 5f;
+            }
+
+            GameObject newGhost = Instantiate(ghost, spawnPos, Quaternion.identity);
+            newGhost.GetComponent<EnemyFollow>().player = player;
+            newGhost.SetActive(true);
+
+            Debug.Log($"👻 Spawned Ghost #{i + 1} near player at {spawnPos}");
+        }
+    }
+
 
     void UpdateDayCounterUI()
     {
