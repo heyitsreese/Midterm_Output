@@ -123,6 +123,10 @@ public class DayNightCycle : MonoBehaviour
     public Vector3 doorSpawnPosition;
     public Vector3 keySpawnPosition;
 
+    public GameObject ghost;
+
+    public Vector3 ghostSpawnPosition;
+
     [Header("UI")]
     public TMP_Text dayCounterText;
 
@@ -160,6 +164,8 @@ public class DayNightCycle : MonoBehaviour
                 isNight = true;
                 cycleTimer = 0f;
                 Debug.Log($"🌙 Night has begun (Day {currentDay})");
+                // ghost active at night 
+                SpawnGhost();
             }
         }
         else
@@ -171,6 +177,8 @@ public class DayNightCycle : MonoBehaviour
             if (cycleTimer >= nightDuration)
             {
                 isNight = false;
+                // ghost gone 
+                ghost.SetActive(false);
                 cycleTimer = 0f;
                 currentDay++;
                 UpdateDayCounterUI();
@@ -219,6 +227,21 @@ public class DayNightCycle : MonoBehaviour
         doorMesh.transform.position = doorSpawnPosition;
         doorMesh.SetActive(true);
         Debug.Log("🚪 Door appeared on Day 5!");
+    }
+
+// one ghost for now 
+    public void SpawnGhost()
+    {
+        if (ghost == null)
+        {
+            Debug.LogError("❌ Ghost not assigned in DayNightCycle!");
+            return;
+        }
+
+        ghost.transform.position = ghostSpawnPosition;
+        ghost.SetActive(true);
+
+        Debug.Log($"✅ ghost active? {ghost.activeSelf} | Position: {ghost.transform.position}");
     }
 
     public void WinGame()
