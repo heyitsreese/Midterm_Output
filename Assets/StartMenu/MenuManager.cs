@@ -33,9 +33,10 @@ public class MenuManager : MonoBehaviour
         Debug.Log("Loaded saved volume: " + savedMusicVolume);
     }
 
+    // opening cutscene plays first 
     public void PlayGame()
     {
-        SceneManager.LoadScene("MainScene");
+        SceneManager.LoadScene("Opening");
     }
 
     public void OpenSettings()
