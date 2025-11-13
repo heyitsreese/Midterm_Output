@@ -19,6 +19,9 @@ public class GhostManager : MonoBehaviour
     public float aggressionMultiplier = 1f;
     public float aggressionIncrease = 0.2f;
 
+    [Header("Day/Night Control")]
+    public bool isDaytime = true;
+
     private void Awake()
     {
         Instance = this;
@@ -26,7 +29,8 @@ public class GhostManager : MonoBehaviour
 
     void Start()
     {
-        SpawnInitialGhosts(2); // initial ghosts (hidden Day 1)
+        SpawnInitialGhosts(2);
+        SetDaytime(isDaytime);
     }
 
     public void SpawnInitialGhosts(int count)
@@ -42,56 +46,101 @@ public class GhostManager : MonoBehaviour
         Transform spawnPos = spawnPoints[Random.Range(0, spawnPoints.Length)];
         GameObject ghost = Instantiate(ghostPrefab, spawnPos.position, Quaternion.identity);
         ghost.SetActive(true);
-        activeGhosts.Add(ghost);
+
+        RegisterGhost(ghost);
+    }
+
+    public void RegisterGhost(GameObject ghost)
+    {
+        if (ghost == null) return;
+
+        if (!activeGhosts.Contains(ghost))
+            activeGhosts.Add(ghost);
 
         EnemyFollow follow = ghost.GetComponent<EnemyFollow>();
-        if (follow != null && player != null)
+        if (follow != null)
         {
-            follow.player = player.transform;
+            follow.player = player != null ? player.transform : null;
             follow.moveSpeed = baseMoveSpeed;
             follow.isAggressive = false;
+            follow.isDaytime = isDaytime;
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ Ghost '{ghost.name}' has no EnemyFollow component!");
+        }
+    }
+
+    public void SetDaytime(bool isDay)
+    {
+        isDaytime = isDay;
+
+        foreach (GameObject g in activeGhosts)
+        {
+            if (g == null) continue;
+
+            EnemyFollow follow = g.GetComponent<EnemyFollow>();
+            if (follow != null)
+                follow.isDaytime = isDay;
+
+            g.SetActive(!isDay); // deactivate during day, activate at night
+        }
+
+        if (!isDay)
+        {
+            Debug.Log("🌙 Nighttime started — ghosts are waking up!");
+            // ensure they know who to follow
+            foreach (GameObject g in activeGhosts)
+            {
+                if (g == null) continue;
+                EnemyFollow follow = g.GetComponent<EnemyFollow>();
+                if (follow != null && player != null)
+                    follow.player = player.transform;
+            }
+        }
+        else
+        {
+            Debug.Log("☀️ Daytime started — ghosts are hiding!");
         }
     }
 
     public void ActivateGhostAggression()
     {
-        if (player == null) return;
-
-        // Find nearest ghost that is not already aggressive
-        GameObject nearest = null;
-        float nearestDist = float.MaxValue;
-
-        foreach (GameObject g in activeGhosts)
+        if (player == null)
         {
-            if (g == null) continue;
-            EnemyFollow follow = g.GetComponent<EnemyFollow>();
-            if (follow == null || follow.isAggressive) continue;
-
-            float dist = Vector3.Distance(g.transform.position, player.transform.position);
-            if (dist < nearestDist)
-            {
-                nearestDist = dist;
-                nearest = g;
-            }
+            Debug.LogWarning("⚠️ GhostManager: Player is null, cannot activate aggression!");
+            return;
         }
 
-        if (nearest != null)
+        bool foundAggressive = false;
+
+        foreach (GameObject ghost in activeGhosts)
         {
-            EnemyFollow follow = nearest.GetComponent<EnemyFollow>();
-            if (follow != null)
+            if (ghost == null || !ghost.activeInHierarchy) continue;
+
+            EnemyFollow follow = ghost.GetComponent<EnemyFollow>();
+            if (follow == null) continue;
+
+            float dist = Vector3.Distance(ghost.transform.position, player.transform.position);
+
+            // Ghosts always can chase at night
+            if (!isDaytime && dist <= 30f)
             {
-                follow.player = player.transform; // Make sure player is assigned
                 follow.isAggressive = true;
                 follow.moveSpeed = baseMoveSpeed * aggressionMultiplier;
 
-                Debug.Log("👻 Ghost is now chasing the player!");
+                if (!foundAggressive)
+                    Debug.Log("👻 Ghosts are now chasing the player!");
 
-                // Stop chasing after 5 seconds if player escapes
-                StartCoroutine(StopAggressionAfterTime(follow, 5f));
+                foundAggressive = true;
+
+                StartCoroutine(StopAggressionAfterTime(follow, 8f));
             }
         }
-    }
 
+        if (!foundAggressive)
+            Debug.Log("😶 No nearby ghosts found to become aggressive.");
+    }
 
     private IEnumerator StopAggressionAfterTime(EnemyFollow follow, float time)
     {
@@ -107,7 +156,7 @@ public class GhostManager : MonoBehaviour
     public void AddCorruption()
     {
         aggressionMultiplier += aggressionIncrease;
-        Debug.Log($"👻 Ghosts are more aggressive! Multiplier: {aggressionMultiplier}");
+        Debug.Log($"💢 Ghosts are more aggressive! Multiplier: {aggressionMultiplier}");
         ActivateGhostAggression();
     }
 }

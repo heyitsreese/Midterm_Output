@@ -4,6 +4,7 @@ public class TrashBin : MonoBehaviour
 {
     public TrashType acceptedType;
     public AudioSource wrongBinSound; // assign this in Inspector
+    public GhostManager ghostManager;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -13,15 +14,10 @@ public class TrashBin : MonoBehaviour
         if (trashItem.trashType != acceptedType)
         {
             Debug.Log("❌ Wrong bin! The world grows more haunted...");
+            
+            wrongBinSound.Play();
 
-            // Play wrong bin whisper
-            if (wrongBinSound != null)
-            {
-                wrongBinSound.Stop(); // ensures it restarts if already playing
-                wrongBinSound.Play();
-            }
-
-            GhostManager.Instance?.AddCorruption();
+            GhostManager.Instance.ActivateGhostAggression();
         }
         else
         {

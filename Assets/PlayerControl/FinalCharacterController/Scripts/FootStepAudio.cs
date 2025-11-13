@@ -34,24 +34,20 @@ public class FootStepAudio : MonoBehaviour
         bool isGrounded = characterController.isGrounded;
         PlayerMovementState movementState = playerState.CurrentPlayerMovementState;
 
-        // Get horizontal velocity (ignore vertical)
-        Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0f, characterController.velocity.z);
-        float speed = horizontalVelocity.magnitude;
+        // Determine movement speed from your PlayerState, not CharacterController.velocity
+        bool isMoving = (movementState == PlayerMovementState.Walking ||
+                        movementState == PlayerMovementState.Running ||
+                        movementState == PlayerMovementState.Sprinting) && isGrounded;
 
-        bool isMoving = speed > minMoveSpeed && isGrounded &&
-                        (movementState == PlayerMovementState.Walking ||
-                         movementState == PlayerMovementState.Running ||
-                         movementState == PlayerMovementState.Sprinting);
+        float currentInterval = walkStepInterval;
+        if (movementState == PlayerMovementState.Running)
+            currentInterval = runStepInterval;
+        else if (movementState == PlayerMovementState.Sprinting)
+            currentInterval = sprintStepInterval;
 
         if (isMoving)
         {
             stepTimer += Time.deltaTime;
-
-            float currentInterval = walkStepInterval;
-            if (movementState == PlayerMovementState.Running)
-                currentInterval = runStepInterval;
-            else if (movementState == PlayerMovementState.Sprinting)
-                currentInterval = sprintStepInterval;
 
             if (stepTimer >= currentInterval)
             {
@@ -61,7 +57,8 @@ public class FootStepAudio : MonoBehaviour
         }
         else
         {
-            stepTimer = 0f;
+            // Instead of resetting to 0, just stop incrementing until player moves again
+            // stepTimer = 0f;  // remove this line
         }
     }
 

@@ -4165,6 +4165,7 @@ MonoBehaviour:
   normalMusicSource: {fileID: 1456958372}
   fearMusicSource: {fileID: 2107249720}
   footstepsSource: {fileID: 510691201}
+  footstepClip: {fileID: 8300000, guid: 31285001b978f644e9b5d24cb62444ac, type: 3}
   whisper1Source: {fileID: 309037531}
   whisper2Source: {fileID: 2107249720}
   clickSound: {fileID: 8300000, guid: c3b4986b77b9dff4686bb25e46730291, type: 3}
@@ -7151,6 +7152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrashBin
   acceptedType: 0
   wrongBinSound: {fileID: 71230730}
+  ghostManager: {fileID: 0}
 --- !u!65 &1332212796
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8145,6 +8147,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrashBin
   acceptedType: 2
   wrongBinSound: {fileID: 71230730}
+  ghostManager: {fileID: 0}
 --- !u!65 &1511131582
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8478,6 +8481,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrashBin
   acceptedType: 3
   wrongBinSound: {fileID: 71230730}
+  ghostManager: {fileID: 0}
 --- !u!65 &1589568177
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9344,10 +9348,14 @@ MonoBehaviour:
   ghostPrefab: {fileID: 925662288}
   spawnPoints: []
   player: {fileID: 125723124}
-  activeGhosts: []
+  activeGhosts:
+  - {fileID: 925662288}
+  - {fileID: 925662288}
+  - {fileID: 925662288}
   baseMoveSpeed: 3
   aggressionMultiplier: 1
   aggressionIncrease: 0.25
+  isDaytime: 1
 --- !u!1 &1747905611
 GameObject:
   m_ObjectHideFlags: 0
@@ -9802,6 +9810,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrashBin
   acceptedType: 1
   wrongBinSound: {fileID: 71230730}
+  ghostManager: {fileID: 0}
 --- !u!65 &1832343671
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10866,13 +10875,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6287976643906002182, guid: 9466f92db452b5e4dbb0ee8d8d1f7f61, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2080673517}
   m_SourcePrefab: {fileID: 100100000, guid: 9466f92db452b5e4dbb0ee8d8d1f7f61, type: 3}
 --- !u!4 &2080673513 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6631746017761429436, guid: 9466f92db452b5e4dbb0ee8d8d1f7f61, type: 3}
   m_PrefabInstance: {fileID: 2080673512}
   m_PrefabAsset: {fileID: 0}
+--- !u!54 &2080673517
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 925662288}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &2090251761
 GameObject:
   m_ObjectHideFlags: 0

@@ -165,7 +165,11 @@ public class DayNightCycle : MonoBehaviour
                 isNight = true;
                 cycleTimer = 0f;
                 Debug.Log($"🌙 Night has begun (Day {currentDay})");
-                // ghost active at night 
+
+                // 👇 Tell the GhostManager that it's now night
+                if (GhostManager.Instance != null)
+                    GhostManager.Instance.SetDaytime(false);
+
                 SpawnGhost();
             }
         }
@@ -178,7 +182,11 @@ public class DayNightCycle : MonoBehaviour
             if (cycleTimer >= nightDuration)
             {
                 isNight = false;
-                // ghost gone 
+
+                // 👇 Tell the GhostManager that it's now daytime
+                if (GhostManager.Instance != null)
+                    GhostManager.Instance.SetDaytime(true);
+
                 ghost.SetActive(false);
                 cycleTimer = 0f;
                 currentDay++;
@@ -195,6 +203,7 @@ public class DayNightCycle : MonoBehaviour
                     EndGame();
             }
         }
+
         if (keyMesh != null && keyMesh.activeSelf == false)
         {
             Debug.LogWarning("⚠️ Key was deactivated unexpectedly!");
@@ -227,6 +236,23 @@ public class DayNightCycle : MonoBehaviour
             }
 
             GameObject newGhost = Instantiate(ghost, spawnPos, Quaternion.identity);
+            EnemyFollow ef = newGhost.GetComponent<EnemyFollow>();
+
+            if (ef != null)
+            {
+                ef.player = player;
+                // ensure originalPosition is set in case Start wasn't called yet
+                ef.transform.position = spawnPos;
+            }
+            newGhost.SetActive(true);
+
+            // Register with GhostManager so ActivateGhostAggression sees it
+            if (GhostManager.Instance != null)
+                GhostManager.Instance.RegisterGhost(newGhost);
+            else
+                Debug.LogWarning("DayNightCycle spawned a ghost but GhostManager.Instance is null.");
+
+            Debug.Log($"👻 Spawned Ghost #{i + 1} near player at {spawnPos}");
             newGhost.GetComponent<EnemyFollow>().player = player;
             newGhost.SetActive(true);
 

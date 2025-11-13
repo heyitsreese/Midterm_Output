@@ -14,6 +14,7 @@ public class AudioManager : MonoBehaviour
 
     [Header("SFX Sources")]
     public AudioSource footstepsSource;
+    public AudioClip footstepClip;
     public AudioSource whisper1Source;
     public AudioSource whisper2Source;
     public AudioClip clickSound;
@@ -72,15 +73,22 @@ public class AudioManager : MonoBehaviour
 
     // ================= SFX ================= //
 
+    public void PlaySFX(AudioClip clip)
+    {
+        if (clip == null || footstepsSource == null) return;
+        footstepsSource.PlayOneShot(clip);
+    }
+
     public void PlayClickSound()
     {
         if (clickSound != null)
             footstepsSource?.PlayOneShot(clickSound); // use footstepsSource for generic SFX
     }
 
-    public void PlayFootsteps()
+    private void PlayFootstep()
     {
-        footstepsSource?.Play();
+        if (footstepClip != null)
+            AudioManager.Instance?.PlaySFX(footstepClip);
     }
 
     public void StopFootsteps()
@@ -114,10 +122,11 @@ public class AudioManager : MonoBehaviour
             audioMixer.SetFloat("SFXVolume", dB);
             PlayerPrefs.SetFloat(SFXVolumeKey, value);
 
-            // Also set volume of individual SFX sources
-            footstepsSource.volume = value;
-            whisper1Source.volume = value;
-            whisper2Source.volume = value;
+            if (footstepsSource) footstepsSource.volume = value;
+            if (whisper1Source) whisper1Source.volume = value;
+            if (whisper2Source) whisper2Source.volume = value;
+
+            Debug.Log($"🎧 Set SFX volume: {value} ({dB} dB)");
         }
     }
 

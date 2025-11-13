@@ -129,7 +129,7 @@ public class PlayerController : MonoBehaviour
 
     private bool IsMovingLaterally()
     {
-        Vector3 lateralVelocity = new Vector3(characterController.velocity.x, 0f, characterController.velocity.y);
+        Vector3 lateralVelocity = new Vector3(characterController.velocity.x, 0f, characterController.velocity.z);
 
         return lateralVelocity.magnitude > movingThres;
     }
