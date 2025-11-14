@@ -147,7 +147,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: f40cab2395ae35d4f869540e23f61dd0, type: 3}
+  m_Resource: {fileID: 8300000, guid: 6daa3eec9db75844bbc9ba133a2831a4, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -769,7 +769,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f729d306d22d0544bdb8b373c206a99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChangeSceneOnTimer
-  changeTime: 4
+  changeTime: 5
   sceneName: MainScene
 --- !u!4 &1213502760
 Transform:

@@ -174,6 +174,7 @@
 //     }
 // }
 
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -190,6 +191,23 @@ public class PickupObject : MonoBehaviour
     private Rigidbody holdRigidbody;
     private Collider holdCollider;
     private TutorialManager tutorialManager;
+
+    public AudioSource wrongBinSound;
+    public AudioSource rightBinSound;
+
+    // test ghost 
+    //public GhostManager ghostManager;
+
+    // wrong item count to decide when whispers start 
+    public float wrongCounter;
+
+    // camera for shake
+    public Camera playerCamera;
+    public float shakeAmount;
+
+    // voices
+    public AudioSource voices;
+
 
     void Start()
     {
@@ -219,6 +237,23 @@ public class PickupObject : MonoBehaviour
         if (holdObject && clickedLeft)
         {
             TryThrowIntoBin();
+        }
+
+        //wrong counter check
+        if (wrongCounter >= 5 && wrongCounter < 10)
+        {
+            shakeAmount = 0.05f;
+            ShakeCamera(shakeAmount);
+            voices.Stop();
+        }
+        else if (wrongCounter >= 10)
+        {
+            shakeAmount = 0.07f;
+            ShakeCamera(shakeAmount);
+        }
+        else if (wrongCounter < 5)
+        {
+            Debug.Log("test");
         }
     }
 
@@ -286,14 +321,33 @@ public class PickupObject : MonoBehaviour
                 if (bin.acceptedType == item.trashType)
                 {
                     Debug.Log($"✅ Correctly disposed {item.trashType} waste in {bin.name}!");
+                    rightBinSound.Play();
                     Destroy(holdObject);
                     holdObject = null;
                     holdRigidbody = null;
                     holdCollider = null;
+
+                    // minus from wrong counter and so player wont have negative wrongCounter
+                    if (wrongCounter >= 1)
+                    {
+                        wrongCounter--;
+
+                    }
+
                 }
                 else
                 {
+                    wrongBinSound.Play();
                     Debug.Log($"❌ Wrong bin! That belongs in {item.trashType} waste, not {bin.acceptedType}.");
+                    //
+                    //GhostManager.Instance.ActivateGhostAggression();
+                    
+                    // add to wrong counter
+                    wrongCounter++;
+                    if (wrongCounter >= 10)
+                    {
+                        voices.Play();
+                    }
                 }
             }
             else
@@ -322,7 +376,7 @@ public class PickupObject : MonoBehaviour
 
         Debug.Log($"🔴 Dropped {holdObject.name}");
         holdObject = null;
-        holdRigidbody = null; 
+        holdRigidbody = null;
         holdCollider = null;
     }
 
@@ -341,5 +395,14 @@ public class PickupObject : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position + transform.forward * 1f, radius);
+    }
+
+    // camera shake
+    void ShakeCamera(float shakeAmount)
+    {
+        if (playerCamera != null)
+        {
+            playerCamera.transform.position = playerCamera.transform.position + Random.insideUnitSphere * shakeAmount;
+        }
     }
 }

@@ -31,6 +31,11 @@ public class GhostManager : MonoBehaviour
     {
         SpawnInitialGhosts(2);
         SetDaytime(isDaytime);
+        // 
+        if (!isDaytime)
+        {
+            EnemyFollow follow = ghostPrefab.GetComponent<EnemyFollow>();
+        }
     }
 
     public void SpawnInitialGhosts(int count)
@@ -106,6 +111,7 @@ public class GhostManager : MonoBehaviour
 
     public void ActivateGhostAggression()
     {
+        Debug.Log("Aggression activated!!");
         if (player == null)
         {
             Debug.LogWarning("⚠️ GhostManager: Player is null, cannot activate aggression!");

@@ -19,6 +19,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource whisper2Source;
     public AudioClip clickSound;
 
+
     private const string MusicVolumeKey = "MusicVolume";
     private const string SFXVolumeKey = "SFXVolume";
 

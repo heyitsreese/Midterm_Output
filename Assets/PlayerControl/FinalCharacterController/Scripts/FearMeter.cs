@@ -163,7 +163,7 @@ public class FearMeter : MonoBehaviour
         HandleAudio();
     }
 
-    void UpdateUI()
+     void UpdateUI()
     {
         if (fearSlider != null)
         {
@@ -269,4 +269,5 @@ public class FearMeter : MonoBehaviour
     {
         fear = Mathf.Clamp(fear + amount, 0f, maxFear);
     }
+
 }
